@@ -1,5 +1,5 @@
-import { start, stop, addLocationListener, Location } from ".";
-import { EmitterSubscription } from "react-native";
+import { start, stop, addLocationListener, Location, requestLocationWithReGeocode} from ".";
+import { EmitterSubscription, Platform } from "react-native";
 
 /**
  * 坐标信息
@@ -83,6 +83,21 @@ export default class Geolocation {
     error?: (error: PositionError) => void,
     options?: PositionOptions
   ) {
+
+    if(Platform.OS == 'ios') {
+      requestLocationWithReGeocode(function (location) {
+        if (location.errorCode) {
+          error && error(new PositionError(location.errorCode, location.errorInfo, location));
+        }
+        else {
+          success(toPosition(location));
+        }
+      },function (e) {
+        error(e)
+      });
+      return;
+    }
+
     const listener = addLocationListener(location => {
       if (location.errorCode) {
         error && error(new PositionError(location.errorCode, location.errorInfo, location));

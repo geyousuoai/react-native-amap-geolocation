@@ -344,6 +344,22 @@ export function setLocatingWithReGeocode(withReGeocode: boolean) {
   }
 }
 
+/**
+ * ios单次定位获取经纬度
+ * @param success
+ * @param error
+ */
+export function requestLocationWithReGeocode(success, error){
+  if (Platform.OS === "ios") {
+    AMapGeolocation.requestLocationWithReGeocode().then(location => {
+      success(location);
+    }).catch((e)=>{
+      error(e);
+    });
+  }
+}
+
+
 export * from "./types";
 export * from "./geolocation";
 export { default as Geolocation } from "./geolocation";

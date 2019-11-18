@@ -41,6 +41,11 @@ RCT_EXPORT_METHOD(setPausesLocationUpdatesAutomatically : (BOOL)value) {
 }
 
 RCT_EXPORT_METHOD(setDesiredAccuracy : (int)value) {
+  if(value == 0){
+     value = kCLLocationAccuracyBest;
+  } else {
+     value = kCLLocationAccuracyHundredMeters;
+  }
   [_manager setDesiredAccuracy:value];
 }
 
@@ -59,6 +64,23 @@ RCT_EXPORT_METHOD(setReGeocodeTimeout : (int)value) {
 RCT_EXPORT_METHOD(setLocationTimeout : (int)value) {
   [_manager setLocationTimeout:value];
 }
+
+
+RCT_EXPORT_METHOD(requestLocationWithReGeocode : (RCTPromiseResolveBlock) resolve
+                  : (RCTPromiseRejectBlock) reject) {
+  [_manager requestLocationWithReGeocode:YES completionBlock:^(CLLocation *location, AMapLocationReGeocode *reGeocode, NSError *error) {
+    if (error)
+    {
+        NSLog(@"locError:{%ld - %@};", (long)error.code, error.localizedDescription);
+      reject(@"requestLocationWithReGeocode error", error.localizedDescription, nil);
+      return;
+    }
+
+    id json = [self json:location reGeocode:reGeocode];
+    resolve(json);
+  }];
+}
+
 
 - (id)json:(CLLocation *)location reGeocode:(AMapLocationReGeocode *)reGeocode {
   if (reGeocode) {
